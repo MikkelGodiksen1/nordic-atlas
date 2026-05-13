@@ -63,6 +63,8 @@ export interface ViewerProps {
   dimensions?: BagDimensions;
   /** Print-area placement rules */
   printArea?: BagPrintArea;
+  /** Multiplier applied to handle height so totes can stretch them taller than retail bags */
+  handleStretch?: number;
 }
 
 /** Export/download options */

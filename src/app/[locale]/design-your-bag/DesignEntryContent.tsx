@@ -39,6 +39,7 @@ export function DesignEntryContent() {
             modelPath="/models/bags/retail_420x120x350mm.glb"
             dimensions={{ width: 0.42, depth: 0.12, height: 0.35 }}
             backgroundClass="bg-gradient-to-br from-slate-50 to-slate-100"
+            handleStretch={2.4}
             index={0}
           />
           <CategoryCard

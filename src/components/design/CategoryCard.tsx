@@ -14,6 +14,7 @@ interface CategoryCardProps {
   modelPath: string;
   dimensions: { width: number; depth: number; height: number };
   backgroundClass: string;
+  handleStretch?: number;
   index: number;
 }
 
@@ -25,6 +26,7 @@ export function CategoryCard({
   modelPath,
   dimensions,
   backgroundClass,
+  handleStretch,
   index,
 }: CategoryCardProps) {
   return (
@@ -37,7 +39,11 @@ export function CategoryCard({
         <GlassCard hover variant="elevated" padding="none" className="overflow-hidden">
           <div className={`relative aspect-[16/10] ${backgroundClass}`}>
             <div className="absolute inset-0">
-              <BagCardPreview modelPath={modelPath} dimensions={dimensions} />
+              <BagCardPreview
+                modelPath={modelPath}
+                dimensions={dimensions}
+                handleStretch={handleStretch}
+              />
             </div>
           </div>
 

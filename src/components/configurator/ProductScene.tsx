@@ -54,9 +54,17 @@ function applyTextureSettings(texture: THREE.Texture, isColorTexture = false) {
 }
 
 function createTextTexture(text: string, textColor: string) {
+  const lines = text
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter((line) => line.length > 0);
+
   const canvas = document.createElement('canvas');
   canvas.width = 4096;
-  canvas.height = 1024;
+  // Scale canvas height with number of lines so aspect ratio stays
+  // consistent when we project the texture onto the bag plane.
+  const lineCount = Math.max(1, lines.length);
+  canvas.height = Math.max(1024, 1024 * lineCount);
 
   const context = canvas.getContext('2d');
   if (!context) {
@@ -68,13 +76,20 @@ function createTextTexture(text: string, textColor: string) {
   context.textAlign = 'center';
   context.textBaseline = 'middle';
 
+  // Shrink font until the widest line fits with margin.
+  const maxLineWidth = (ctx: CanvasRenderingContext2D) =>
+    lines.reduce((max, line) => Math.max(max, ctx.measureText(line).width), 0);
   let fontSize = 420;
   do {
     context.font = `700 ${fontSize}px "Segoe UI", Arial, sans-serif`;
     fontSize -= 16;
-  } while (fontSize > 140 && context.measureText(text).width > canvas.width * 0.86);
+  } while (fontSize > 140 && maxLineWidth(context) > canvas.width * 0.86);
 
-  context.fillText(text, canvas.width / 2, canvas.height / 2);
+  const lineHeight = canvas.height / lineCount;
+  lines.forEach((line, idx) => {
+    const y = lineHeight * (idx + 0.5);
+    context.fillText(line, canvas.width / 2, y);
+  });
 
   const texture = new THREE.CanvasTexture(canvas);
   texture.colorSpace = THREE.SRGBColorSpace;
@@ -199,7 +214,11 @@ function TextLayer({
   width: number;
 }) {
   const textTexture = useMemo(() => createTextTexture(text, textColor), [text, textColor]);
-  const planeHeight = Math.max(0.042, width * 0.135);
+  const lineCount = Math.max(
+    1,
+    text.split(/\r?\n/).map((line) => line.trim()).filter((line) => line.length > 0).length
+  );
+  const planeHeight = Math.max(0.042, width * 0.135) * lineCount;
 
   useEffect(() => () => textTexture.dispose(), [textTexture]);
 
@@ -226,8 +245,10 @@ function BagMesh({
   customText,
   dimensions,
   printArea,
+  handleStretch = 1,
 }: Required<Pick<ViewerProps, 'modelPath' | 'colorHex' | 'customText' | 'dimensions' | 'logoScale' | 'removeWhiteBackground'>> & {
   logoUrl: string | null;
+  handleStretch?: number;
   printArea?: BagPrintArea;
 }) {
   const { scene } = useGLTF(modelPath);
@@ -302,6 +323,23 @@ function BagMesh({
 
       if (materialName.includes('handle') || objectName.includes('handle')) {
         child.material = handleMaterial;
+        if (handleStretch !== 1) {
+          child.geometry.computeBoundingBox();
+          const bbox = child.geometry.boundingBox;
+          if (bbox) {
+            const bottomY = bbox.min.y;
+            // Translate so the bottom of the handle sits at Y=0, scale Y so the
+            // arch rises higher, then translate back. This keeps the attachment
+            // point on the bag while extending the loop upward like a real tote.
+            const matrix = new THREE.Matrix4()
+              .makeTranslation(0, -bottomY, 0)
+              .premultiply(new THREE.Matrix4().makeScale(1, handleStretch, 1))
+              .premultiply(new THREE.Matrix4().makeTranslation(0, bottomY, 0));
+            child.geometry.applyMatrix4(matrix);
+            child.geometry.computeBoundingBox();
+            child.geometry.computeBoundingSphere();
+          }
+        }
         return;
       }
 
@@ -365,7 +403,8 @@ export function ProductScene({
   customText,
   dimensions,
   printArea,
-}: Pick<ViewerProps, 'modelPath' | 'colorHex' | 'logoUrl' | 'logoScale' | 'removeWhiteBackground' | 'customText' | 'dimensions' | 'printArea'>) {
+  handleStretch,
+}: Pick<ViewerProps, 'modelPath' | 'colorHex' | 'logoUrl' | 'logoScale' | 'removeWhiteBackground' | 'customText' | 'dimensions' | 'printArea' | 'handleStretch'>) {
   if (!modelPath || !dimensions) {
     return null;
   }
@@ -411,6 +450,7 @@ export function ProductScene({
           customText={customText}
           dimensions={dimensions}
           printArea={printArea}
+          handleStretch={handleStretch}
         />
       </Suspense>
 

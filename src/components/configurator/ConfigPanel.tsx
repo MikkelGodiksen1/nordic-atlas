@@ -235,12 +235,13 @@ export function ConfigPanel({
             {t('addText')}
           </label>
           <p className="mb-3 text-xs text-slate-500">{t('addTextDescription')}</p>
-          <input
-            type="text"
+          <textarea
             value={customText}
             onChange={(event) => onChangeText(event.target.value)}
             placeholder={t('addTextPlaceholder')}
-            className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm transition-all placeholder:text-slate-400 focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-500/30"
+            rows={3}
+            maxLength={120}
+            className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm transition-all placeholder:text-slate-400 focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-500/30 resize-none"
           />
         </div>
       )}

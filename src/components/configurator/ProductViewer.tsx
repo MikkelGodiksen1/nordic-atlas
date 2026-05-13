@@ -72,6 +72,7 @@ export function ProductViewer({
   customText,
   dimensions,
   printArea,
+  handleStretch,
 }: ViewerProps) {
   const t = useTranslations('configurator');
   const has3DModel = Boolean(modelPath && dimensions);
@@ -89,6 +90,7 @@ export function ProductViewer({
           customText={customText}
           dimensions={dimensions}
           printArea={printArea}
+          handleStretch={handleStretch}
         />
       ) : (
         <PlaceholderBag

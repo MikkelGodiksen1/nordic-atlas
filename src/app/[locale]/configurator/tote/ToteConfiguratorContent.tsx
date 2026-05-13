@@ -99,6 +99,7 @@ export function ToteConfiguratorContent() {
                 customText={state.customText}
                 dimensions={currentVariant?.dimensions}
                 printArea={currentVariant?.printArea}
+                handleStretch={2.4}
               />
             </GlassCard>
           </div>

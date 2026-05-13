@@ -16,10 +16,12 @@ function StaticBag({
   modelPath,
   colorHex,
   dimensions,
+  handleStretch = 1,
 }: {
   modelPath: string;
   colorHex: string;
   dimensions: { width: number; depth: number; height: number };
+  handleStretch?: number;
 }) {
   const { scene } = useGLTF(modelPath);
   const clonedScene = useMemo(() => scene.clone(true), [scene]);
@@ -61,8 +63,28 @@ function StaticBag({
         child.geometry.setAttribute('uv2', new THREE.Float32BufferAttribute(Array.from(uvAttribute.array), 2));
       }
       child.material = material;
+
+      const objectName = child.name.toLowerCase();
+      const materialName = Array.isArray(child.material)
+        ? child.material.map((m) => m.name.toLowerCase()).join(' ')
+        : (child.material as THREE.Material).name?.toLowerCase() ?? '';
+      const isHandle = objectName.includes('handle') || materialName.includes('handle');
+      if (isHandle && handleStretch !== 1) {
+        child.geometry.computeBoundingBox();
+        const bbox = child.geometry.boundingBox;
+        if (bbox) {
+          const bottomY = bbox.min.y;
+          const matrix = new THREE.Matrix4()
+            .makeTranslation(0, -bottomY, 0)
+            .premultiply(new THREE.Matrix4().makeScale(1, handleStretch, 1))
+            .premultiply(new THREE.Matrix4().makeTranslation(0, bottomY, 0));
+          child.geometry.applyMatrix4(matrix);
+          child.geometry.computeBoundingBox();
+          child.geometry.computeBoundingSphere();
+        }
+      }
     });
-  }, [clonedScene, material]);
+  }, [clonedScene, material, handleStretch]);
 
   useEffect(() => () => material.dispose(), [material]);
 
@@ -79,12 +101,14 @@ interface BagCardPreviewProps {
   modelPath: string;
   dimensions: { width: number; depth: number; height: number };
   colorHex?: string;
+  handleStretch?: number;
 }
 
 export function BagCardPreview({
   modelPath,
   dimensions,
   colorHex = '#F5F0E8',
+  handleStretch = 1,
 }: BagCardPreviewProps) {
   const maxSide = Math.max(dimensions.width, dimensions.depth, dimensions.height) * 4.8;
 
@@ -106,7 +130,12 @@ export function BagCardPreview({
       <hemisphereLight args={['#ffffff', '#d7dee7', 0.4]} />
       <directionalLight position={[maxSide * 1.5, maxSide * 1.6, maxSide * 1.5]} intensity={0.6} />
       <Suspense fallback={null}>
-        <StaticBag modelPath={modelPath} colorHex={colorHex} dimensions={dimensions} />
+        <StaticBag
+          modelPath={modelPath}
+          colorHex={colorHex}
+          dimensions={dimensions}
+          handleStretch={handleStretch}
+        />
       </Suspense>
     </Canvas>
   );

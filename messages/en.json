@@ -237,9 +237,10 @@
     "invalidEmail": "Invalid email address",
     "errorMessage": "Something went wrong — please try again.",
     "success": {
-      "title": "Thank you for your inquiry!",
-      "description": "You can now download your preview. Our team will review your design and contact you within 1-2 business days.",
+      "title": "Thank you — we have received your design!",
+      "description": "Your preview has been downloaded. Our team will review your design and contact you within 1-2 business days with a quote and next steps.",
       "download": "Download preview",
+      "close": "Close",
       "note": "We respond to all inquiries personally — no automated replies.",
       "backToDesign": "Design another bag",
       "backToHome": "Go to homepage"

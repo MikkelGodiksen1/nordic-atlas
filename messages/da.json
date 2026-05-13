@@ -237,9 +237,10 @@
     "invalidEmail": "Ugyldig e-mailadresse",
     "errorMessage": "Noget gik galt — prøv igen.",
     "success": {
-      "title": "Tak for din forespørgsel!",
-      "description": "Du kan nu downloade din forhåndsvisning. Vores team gennemgår dit design og kontakter dig inden for 1-2 hverdage.",
+      "title": "Tak — vi har modtaget dit design!",
+      "description": "Din forhåndsvisning er downloadet. Vores team gennemgår dit design og kontakter dig inden for 1-2 hverdage med et tilbud og næste skridt.",
       "download": "Download forhåndsvisning",
+      "close": "Luk",
       "note": "Vi svarer på alle henvendelser personligt — ingen automatiserede svar.",
       "backToDesign": "Design en ny pose",
       "backToHome": "Gå til forsiden"

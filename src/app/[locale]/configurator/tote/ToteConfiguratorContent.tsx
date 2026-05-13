@@ -1,16 +1,16 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import { useConfigurator } from '@/hooks/useConfigurator';
 import { usePreviewExport } from '@/components/configurator/PreviewExport';
 import { ProductViewer } from '@/components/configurator/ProductViewer';
 import { ConfigPanel } from '@/components/configurator/ConfigPanel';
-import { InquiryForm } from '@/components/configurator/InquiryForm';
+import { InquiryModal } from '@/components/configurator/InquiryModal';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { ArrowLeft } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 export function ToteConfiguratorContent() {
   const t = useTranslations('configurator');
@@ -27,6 +27,7 @@ export function ToteConfiguratorContent() {
     currentFamily,
     currentSize,
     submissionStatus,
+    setSubmissionStatus,
     selectFamily,
     selectSize,
     selectColor,
@@ -51,6 +52,20 @@ export function ToteConfiguratorContent() {
     setShowInquiry(true);
   }
 
+  const handleAutoDownload = useCallback(() => {
+    downloadPreview(pendingPreview);
+  }, [downloadPreview, pendingPreview]);
+
+  function handleClose() {
+    setShowInquiry(false);
+    setSubmissionStatus('idle');
+  }
+
+  useEffect(() => {
+    if (!showInquiry) return;
+    setSubmissionStatus('idle');
+  }, [showInquiry, setSubmissionStatus]);
+
   return (
     <section className="min-h-screen pt-4 pb-16 md:pt-8 md:pb-24">
       <div className="fixed inset-0 gradient-subtle -z-10" />
@@ -70,70 +85,60 @@ export function ToteConfiguratorContent() {
           </Link>
         </motion.div>
 
-        <AnimatePresence mode="wait">
-          {showInquiry ? (
-            <InquiryForm
-              key="inquiry"
-              status={submissionStatus}
-              previewImage={pendingPreview}
-              onSubmit={(formData) => submitInquiry(formData, pendingPreview)}
-              onDownload={() => downloadPreview(pendingPreview)}
-              onBack={() => setShowInquiry(false)}
-            />
-          ) : (
-            <motion.div
-              key="configurator"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="grid grid-cols-1 lg:grid-cols-5 gap-6 lg:gap-8"
-            >
-              <div className="lg:col-span-3" ref={viewerRef}>
-                <GlassCard variant="elevated" padding="sm">
-                  <ProductViewer
-                    modelPath={currentVariant?.modelPath}
-                    variantLabel={currentVariant ? tGlobal(currentVariant.nameKey) : state.variantId}
-                    sizeLabel={currentVariant?.sizeLabel}
-                    colorHex={currentColor?.hex ?? '#F5F0E8'}
-                    logoUrl={state.logoPreviewUrl}
-                    logoScale={state.logoScale}
-                    removeWhiteBackground={state.removeWhiteBackground}
-                    customText={state.customText}
-                    dimensions={currentVariant?.dimensions}
-                    printArea={currentVariant?.printArea}
-                  />
-                </GlassCard>
-              </div>
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 lg:gap-8">
+          <div className="lg:col-span-3" ref={viewerRef}>
+            <GlassCard variant="elevated" padding="sm">
+              <ProductViewer
+                modelPath={currentVariant?.modelPath}
+                variantLabel={currentVariant ? tGlobal(currentVariant.nameKey) : state.variantId}
+                sizeLabel={currentVariant?.sizeLabel}
+                colorHex={currentColor?.hex ?? '#F5F0E8'}
+                logoUrl={state.logoPreviewUrl}
+                logoScale={state.logoScale}
+                removeWhiteBackground={state.removeWhiteBackground}
+                customText={state.customText}
+                dimensions={currentVariant?.dimensions}
+                printArea={currentVariant?.printArea}
+              />
+            </GlassCard>
+          </div>
 
-              <div className="lg:col-span-2">
-                <GlassCard variant="elevated" padding="md">
-                  <ConfigPanel
-                    variants={variants}
-                    selectedVariantId={state.variantId}
-                    selectedFamily={currentFamily}
-                    selectedSize={currentSize}
-                    selectedColorId={state.colorId}
-                    logoPreviewUrl={state.logoPreviewUrl}
-                    customText={state.customText}
-                    logoScale={state.logoScale}
-                    removeWhiteBackground={state.removeWhiteBackground}
-                    showVariantSelector={false}
-                    onSelectFamily={selectFamily}
-                    onSelectSize={selectSize}
-                    onSelectColor={selectColor}
-                    onUploadLogo={uploadLogo}
-                    onRemoveLogo={removeLogo}
-                    onChangeText={setCustomText}
-                    onChangeLogoScale={setLogoScale}
-                    onToggleWhiteBackground={setRemoveWhiteBackground}
-                    onReset={resetDesign}
-                    onSubmit={handleOpenInquiry}
-                  />
-                </GlassCard>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+          <div className="lg:col-span-2">
+            <GlassCard variant="elevated" padding="md">
+              <ConfigPanel
+                variants={variants}
+                selectedVariantId={state.variantId}
+                selectedFamily={currentFamily}
+                selectedSize={currentSize}
+                selectedColorId={state.colorId}
+                logoPreviewUrl={state.logoPreviewUrl}
+                customText={state.customText}
+                logoScale={state.logoScale}
+                removeWhiteBackground={state.removeWhiteBackground}
+                showVariantSelector={false}
+                onSelectFamily={selectFamily}
+                onSelectSize={selectSize}
+                onSelectColor={selectColor}
+                onUploadLogo={uploadLogo}
+                onRemoveLogo={removeLogo}
+                onChangeText={setCustomText}
+                onChangeLogoScale={setLogoScale}
+                onToggleWhiteBackground={setRemoveWhiteBackground}
+                onReset={resetDesign}
+                onSubmit={handleOpenInquiry}
+              />
+            </GlassCard>
+          </div>
+        </div>
+
+        <InquiryModal
+          open={showInquiry}
+          status={submissionStatus}
+          previewImage={pendingPreview}
+          onSubmit={(formData) => submitInquiry(formData, pendingPreview)}
+          onAutoDownload={handleAutoDownload}
+          onClose={handleClose}
+        />
       </div>
     </section>
   );

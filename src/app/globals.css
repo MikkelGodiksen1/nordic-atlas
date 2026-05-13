@@ -45,6 +45,40 @@
     padding-right: 16px;
   }
 
+  /* Configurator + design-entry container */
+  .container-width {
+    max-width: 1312px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  /* Brand gradient used by primary buttons */
+  .gradient-brand {
+    background-image: linear-gradient(135deg, #095d36 0%, #064e2e 60%, #022c18 100%);
+    color: #ffffff;
+  }
+
+  .gradient-brand:hover {
+    background-image: linear-gradient(135deg, #0b6e3f 0%, #075933 60%, #033321 100%);
+  }
+
+  /* Subtle background gradient behind configurator + design-entry */
+  .gradient-subtle {
+    background-image:
+      radial-gradient(ellipse at top, rgba(16, 185, 129, 0.06), transparent 60%),
+      linear-gradient(180deg, #fafbfc 0%, #f1f5f9 100%);
+  }
+
+  /* Small glass pill used inside the 3D viewer overlay */
+  .glass-card {
+    background-color: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+  }
+
   /* Glass effects */
   .glass-button {
     backdrop-filter: blur(11px);

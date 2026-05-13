@@ -2,7 +2,7 @@
 
 import { Suspense, useEffect, useMemo, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { OrbitControls, useGLTF, useTexture } from '@react-three/drei';
+import { Environment, OrbitControls, useGLTF, useTexture } from '@react-three/drei';
 import * as THREE from 'three';
 import type { ViewerProps } from '@/types/configurator';
 import type { BagPrintArea } from '@/types/products';
@@ -248,9 +248,11 @@ function BagMesh({
     normalMap: fabricTextures.normal,
     roughnessMap: fabricTextures.roughness,
     aoMap: fabricTextures.ao,
-    normalScale: new THREE.Vector2(0.8, 0.8),
-    roughness: 0.86,
-    metalness: 0.02,
+    aoMapIntensity: 1.15,
+    normalScale: new THREE.Vector2(2.5, 2.5),
+    roughness: 0.93,
+    metalness: 0.0,
+    envMapIntensity: 0.55,
     side: THREE.DoubleSide,
   }), [colorHex, fabricTextures.ao, fabricTextures.color, fabricTextures.normal, fabricTextures.roughness]);
 
@@ -260,9 +262,11 @@ function BagMesh({
     normalMap: fabricTextures.normal,
     roughnessMap: fabricTextures.roughness,
     aoMap: fabricTextures.ao,
-    normalScale: new THREE.Vector2(0.7, 0.7),
-    roughness: 0.82,
-    metalness: 0.02,
+    aoMapIntensity: 1.2,
+    normalScale: new THREE.Vector2(2.0, 2.0),
+    roughness: 0.9,
+    metalness: 0.0,
+    envMapIntensity: 0.5,
     side: THREE.DoubleSide,
   }), [colorHex, fabricTextures.ao, fabricTextures.color, fabricTextures.normal, fabricTextures.roughness]);
 
@@ -272,9 +276,11 @@ function BagMesh({
     normalMap: fabricTextures.normal,
     roughnessMap: fabricTextures.roughness,
     aoMap: fabricTextures.ao,
-    normalScale: new THREE.Vector2(0.9, 0.9),
-    roughness: 0.92,
-    metalness: 0.02,
+    aoMapIntensity: 1.3,
+    normalScale: new THREE.Vector2(2.5, 2.5),
+    roughness: 0.96,
+    metalness: 0.0,
+    envMapIntensity: 0.45,
     side: THREE.DoubleSide,
   }), [colorHex, fabricTextures.ao, fabricTextures.color, fabricTextures.normal, fabricTextures.roughness]);
 
@@ -373,18 +379,26 @@ export function ProductScene({
     <Canvas
       key={modelPath}
       dpr={[1, 2.25]}
-      gl={{ antialias: true, alpha: true, preserveDrawingBuffer: true }}
+      gl={{
+        antialias: true,
+        alpha: true,
+        preserveDrawingBuffer: true,
+        toneMapping: THREE.ACESFilmicToneMapping,
+        toneMappingExposure: 0.95,
+      }}
       camera={{ position: [displayedMax * 0.42, displayedHeight * 0.56, cameraDistance], fov: 32 }}
     >
-      <ambientLight intensity={0.95} />
-      <hemisphereLight args={['#ffffff', '#d7dee7', 1.12]} />
+      <Suspense fallback={null}>
+        <Environment preset="studio" environmentIntensity={0.85} />
+      </Suspense>
+      <hemisphereLight args={['#ffffff', '#d7dee7', 0.35]} />
       <directionalLight
         position={[displayedMax * 1.75, displayedHeight * 1.8, displayedMax * 1.9]}
-        intensity={1.95}
+        intensity={0.55}
       />
       <directionalLight
         position={[-displayedMax * 1.25, displayedHeight * 0.92, -displayedMax * 1.5]}
-        intensity={0.78}
+        intensity={0.25}
       />
 
       <Suspense fallback={null}>

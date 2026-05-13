@@ -36,7 +36,9 @@ export function DesignEntryContent() {
             description={t('tote.description')}
             cta={t('tote.cta')}
             href="/configurator/tote"
-            gradient="from-brand-800 to-brand-600"
+            modelPath="/models/bags/retail_420x120x350mm.glb"
+            dimensions={{ width: 0.42, depth: 0.12, height: 0.35 }}
+            backgroundClass="bg-gradient-to-br from-slate-50 to-slate-100"
             index={0}
           />
           <CategoryCard
@@ -44,7 +46,9 @@ export function DesignEntryContent() {
             description={t('retail.description')}
             cta={t('retail.cta')}
             href="/configurator/retail"
-            gradient="from-slate-800 to-slate-600"
+            modelPath="/models/bags/takeaway_360x330x260mm.glb"
+            dimensions={{ width: 0.36, depth: 0.33, height: 0.26 }}
+            backgroundClass="bg-gradient-to-br from-slate-50 to-slate-100"
             index={1}
           />
         </div>

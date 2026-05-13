@@ -4,17 +4,29 @@ import { Link } from '@/i18n/navigation';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { BagCardPreview } from './BagCardPreview';
 
 interface CategoryCardProps {
   title: string;
   description: string;
   cta: string;
   href: '/configurator/tote' | '/configurator/retail';
-  gradient: string;
+  modelPath: string;
+  dimensions: { width: number; depth: number; height: number };
+  backgroundClass: string;
   index: number;
 }
 
-export function CategoryCard({ title, description, cta, href, gradient, index }: CategoryCardProps) {
+export function CategoryCard({
+  title,
+  description,
+  cta,
+  href,
+  modelPath,
+  dimensions,
+  backgroundClass,
+  index,
+}: CategoryCardProps) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 30 }}
@@ -23,22 +35,12 @@ export function CategoryCard({ title, description, cta, href, gradient, index }:
     >
       <Link href={href} className="group block">
         <GlassCard hover variant="elevated" padding="none" className="overflow-hidden">
-          {/* Image area — replace with product photography */}
-          <div className={`relative aspect-[16/10] bg-gradient-to-br ${gradient}`}>
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-24 h-24 rounded-2xl bg-white/10 backdrop-blur-sm flex items-center justify-center">
-                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" />
-                  <line x1="3" y1="6" x2="21" y2="6" />
-                  <path d="M16 10a4 4 0 01-8 0" />
-                </svg>
-              </div>
+          <div className={`relative aspect-[16/10] ${backgroundClass}`}>
+            <div className="absolute inset-0">
+              <BagCardPreview modelPath={modelPath} dimensions={dimensions} />
             </div>
-            {/* Subtle overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
           </div>
 
-          {/* Content */}
           <div className="p-7 md:p-8">
             <h3 className="text-xl md:text-2xl font-bold text-slate-900 mb-3 group-hover:text-brand-800 transition-colors">
               {title}

@@ -1,49 +1,61 @@
 'use client';
 
-import { useCallback, useRef, useState } from 'react';
-import { useTranslations } from 'next-intl';
+import { useCallback, useState } from 'react';
 
 interface PreviewExportProps {
-  /** Reference to the viewer container element for screenshot capture */
   viewerRef: React.RefObject<HTMLDivElement | null>;
   variantId: string;
   colorId: string;
 }
 
-/**
- * Handles exporting the product preview as an image.
- *
- * Current implementation uses html2canvas to capture the viewer DOM.
- * Future implementation can capture the Three.js canvas directly
- * using renderer.domElement.toDataURL().
- */
+async function captureViewer(element: HTMLDivElement): Promise<string | null> {
+  const html2canvas = (await import('html2canvas')).default;
+  const canvas = await html2canvas(element, {
+    backgroundColor: '#f8fafc',
+    scale: 2,
+    useCORS: true,
+  });
+  return canvas.toDataURL('image/png');
+}
+
+function downloadDataUrl(dataUrl: string, filename: string) {
+  const link = document.createElement('a');
+  link.download = filename;
+  link.href = dataUrl;
+  link.click();
+}
+
 export function usePreviewExport({ viewerRef, variantId, colorId }: PreviewExportProps) {
   const [isExporting, setIsExporting] = useState(false);
 
-  const exportPreview = useCallback(async () => {
-    if (!viewerRef.current) return;
+  const capturePreview = useCallback(async (): Promise<string | null> => {
+    if (!viewerRef.current) return null;
     setIsExporting(true);
-
     try {
-      // Dynamic import to avoid SSR issues
-      const html2canvas = (await import('html2canvas')).default;
-
-      const canvas = await html2canvas(viewerRef.current, {
-        backgroundColor: '#f8fafc',
-        scale: 2,
-        useCORS: true,
-      });
-
-      const link = document.createElement('a');
-      link.download = `nordic-atlas-${variantId}-${colorId}.png`;
-      link.href = canvas.toDataURL('image/png');
-      link.click();
+      return await captureViewer(viewerRef.current);
     } catch (error) {
-      console.error('Export failed:', error);
+      console.error('Capture failed:', error);
+      return null;
     } finally {
       setIsExporting(false);
     }
-  }, [viewerRef, variantId, colorId]);
+  }, [viewerRef]);
 
-  return { exportPreview, isExporting };
+  const downloadPreview = useCallback(
+    (dataUrl?: string | null) => {
+      const filename = `nordic-atlas-${variantId}-${colorId}.png`;
+      if (dataUrl) {
+        downloadDataUrl(dataUrl, filename);
+        return;
+      }
+      // Fallback: capture and download
+      if (!viewerRef.current) return;
+      void captureViewer(viewerRef.current).then((data) => {
+        if (data) downloadDataUrl(data, filename);
+      });
+    },
+    [viewerRef, variantId, colorId]
+  );
+
+  return { capturePreview, downloadPreview, isExporting };
 }

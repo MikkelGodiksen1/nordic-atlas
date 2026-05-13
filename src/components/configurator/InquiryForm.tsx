@@ -6,11 +6,12 @@ import { Link } from '@/i18n/navigation';
 import { Button } from '@/components/ui/Button';
 import { GlassCard } from '@/components/ui/GlassCard';
 import type { SubmissionStatus } from '@/types/configurator';
-import { CheckCircle, ArrowLeft, Home } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { CheckCircle, ArrowLeft, Home, Download } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 interface InquiryFormProps {
   status: SubmissionStatus;
+  previewImage?: string | null;
   onSubmit: (data: {
     name: string;
     company: string;
@@ -18,10 +19,17 @@ interface InquiryFormProps {
     phone: string;
     notes: string;
   }) => void;
+  onDownload?: () => void;
   onBack: () => void;
 }
 
-export function InquiryForm({ status, onSubmit, onBack }: InquiryFormProps) {
+export function InquiryForm({
+  status,
+  previewImage,
+  onSubmit,
+  onDownload,
+  onBack,
+}: InquiryFormProps) {
   const t = useTranslations('inquiry');
   const [form, setForm] = useState({
     name: '',
@@ -38,6 +46,7 @@ export function InquiryForm({ status, onSubmit, onBack }: InquiryFormProps) {
     if (!form.company.trim()) errs.company = t('required');
     if (!form.email.trim()) errs.email = t('required');
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) errs.email = t('invalidEmail');
+    if (!form.phone.trim()) errs.phone = t('required');
     return errs;
   }
 
@@ -54,7 +63,6 @@ export function InquiryForm({ status, onSubmit, onBack }: InquiryFormProps) {
     if (errors[key]) setErrors((prev) => ({ ...prev, [key]: '' }));
   }
 
-  // Success state
   if (status === 'success') {
     return (
       <motion.div
@@ -69,10 +77,33 @@ export function InquiryForm({ status, onSubmit, onBack }: InquiryFormProps) {
           <h3 className="text-xl font-bold text-slate-900 mb-3">
             {t('success.title')}
           </h3>
-          <p className="text-slate-600 leading-relaxed mb-2">
+          <p className="text-slate-600 leading-relaxed mb-6">
             {t('success.description')}
           </p>
-          <p className="text-sm text-slate-500 italic mb-8">
+
+          {previewImage && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={previewImage}
+              alt="Preview"
+              className="w-full rounded-xl border border-slate-200 mb-5"
+            />
+          )}
+
+          {onDownload && (
+            <Button
+              type="button"
+              variant="primary"
+              size="md"
+              onClick={onDownload}
+              className="w-full mb-3"
+            >
+              <Download size={16} />
+              {t('success.download')}
+            </Button>
+          )}
+
+          <p className="text-sm text-slate-500 italic mb-6">
             {t('success.note')}
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
@@ -109,8 +140,18 @@ export function InquiryForm({ status, onSubmit, onBack }: InquiryFormProps) {
         <h3 className="text-lg font-bold text-slate-900 mb-1">{t('title')}</h3>
         <p className="text-sm text-slate-500 mb-6">{t('subtitle')}</p>
 
+        {previewImage && (
+          <div className="mb-6">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={previewImage}
+              alt="Preview"
+              className="w-full rounded-xl border border-slate-200"
+            />
+          </div>
+        )}
+
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Name */}
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1.5">{t('name')}</label>
             <input
@@ -123,7 +164,6 @@ export function InquiryForm({ status, onSubmit, onBack }: InquiryFormProps) {
             {errors.name && <p className="text-xs text-red-500 mt-1">{errors.name}</p>}
           </div>
 
-          {/* Company */}
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1.5">{t('company')}</label>
             <input
@@ -136,7 +176,6 @@ export function InquiryForm({ status, onSubmit, onBack }: InquiryFormProps) {
             {errors.company && <p className="text-xs text-red-500 mt-1">{errors.company}</p>}
           </div>
 
-          {/* Email */}
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1.5">{t('email')}</label>
             <input
@@ -149,7 +188,6 @@ export function InquiryForm({ status, onSubmit, onBack }: InquiryFormProps) {
             {errors.email && <p className="text-xs text-red-500 mt-1">{errors.email}</p>}
           </div>
 
-          {/* Phone */}
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1.5">{t('phone')}</label>
             <input
@@ -157,11 +195,11 @@ export function InquiryForm({ status, onSubmit, onBack }: InquiryFormProps) {
               value={form.phone}
               onChange={(e) => updateField('phone', e.target.value)}
               placeholder={t('phonePlaceholder')}
-              className={`${inputClass} border-slate-200`}
+              className={`${inputClass} ${errors.phone ? 'border-red-400' : 'border-slate-200'}`}
             />
+            {errors.phone && <p className="text-xs text-red-500 mt-1">{errors.phone}</p>}
           </div>
 
-          {/* Notes */}
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1.5">{t('notes')}</label>
             <textarea
@@ -173,7 +211,6 @@ export function InquiryForm({ status, onSubmit, onBack }: InquiryFormProps) {
             />
           </div>
 
-          {/* Actions */}
           <div className="flex gap-3 pt-2">
             <Button type="button" variant="ghost" size="md" onClick={onBack} className="flex-1">
               <ArrowLeft size={16} />
@@ -190,7 +227,7 @@ export function InquiryForm({ status, onSubmit, onBack }: InquiryFormProps) {
           </div>
 
           {status === 'error' && (
-            <p className="text-sm text-red-500 text-center">{t('submitting')}</p>
+            <p className="text-sm text-red-500 text-center">{t('errorMessage')}</p>
           )}
         </form>
       </GlassCard>

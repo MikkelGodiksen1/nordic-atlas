@@ -17,6 +17,7 @@ export function ToteConfiguratorContent() {
   const tGlobal = useTranslations();
   const viewerRef = useRef<HTMLDivElement>(null);
   const [showInquiry, setShowInquiry] = useState(false);
+  const [pendingPreview, setPendingPreview] = useState<string | null>(null);
 
   const {
     state,
@@ -38,18 +39,23 @@ export function ToteConfiguratorContent() {
     submitInquiry,
   } = useConfigurator({ category: 'tote' });
 
-  const { exportPreview } = usePreviewExport({
+  const { capturePreview, downloadPreview } = usePreviewExport({
     viewerRef,
     variantId: state.variantId,
     colorId: state.colorId,
   });
+
+  async function handleOpenInquiry() {
+    const preview = await capturePreview();
+    setPendingPreview(preview);
+    setShowInquiry(true);
+  }
 
   return (
     <section className="min-h-screen pt-4 pb-16 md:pt-8 md:pb-24">
       <div className="fixed inset-0 gradient-subtle -z-10" />
 
       <div className="container-width">
-        {/* Back link */}
         <motion.div
           initial={{ opacity: 0, x: -10 }}
           animate={{ opacity: 1, x: 0 }}
@@ -69,7 +75,9 @@ export function ToteConfiguratorContent() {
             <InquiryForm
               key="inquiry"
               status={submissionStatus}
-              onSubmit={(formData) => submitInquiry(formData)}
+              previewImage={pendingPreview}
+              onSubmit={(formData) => submitInquiry(formData, pendingPreview)}
+              onDownload={() => downloadPreview(pendingPreview)}
               onBack={() => setShowInquiry(false)}
             />
           ) : (
@@ -80,7 +88,6 @@ export function ToteConfiguratorContent() {
               exit={{ opacity: 0 }}
               className="grid grid-cols-1 lg:grid-cols-5 gap-6 lg:gap-8"
             >
-              {/* Viewer (3/5 width) */}
               <div className="lg:col-span-3" ref={viewerRef}>
                 <GlassCard variant="elevated" padding="sm">
                   <ProductViewer
@@ -98,7 +105,6 @@ export function ToteConfiguratorContent() {
                 </GlassCard>
               </div>
 
-              {/* Config panel (2/5 width) */}
               <div className="lg:col-span-2">
                 <GlassCard variant="elevated" padding="md">
                   <ConfigPanel
@@ -121,8 +127,7 @@ export function ToteConfiguratorContent() {
                     onChangeLogoScale={setLogoScale}
                     onToggleWhiteBackground={setRemoveWhiteBackground}
                     onReset={resetDesign}
-                    onSubmit={() => setShowInquiry(true)}
-                    onDownload={exportPreview}
+                    onSubmit={handleOpenInquiry}
                   />
                 </GlassCard>
               </div>

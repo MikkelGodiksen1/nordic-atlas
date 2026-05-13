@@ -30,7 +30,6 @@ interface ConfigPanelProps {
   onToggleWhiteBackground: (enabled: boolean) => void;
   onReset: () => void;
   onSubmit: () => void;
-  onDownload: () => void;
 }
 
 const SIZE_ORDER: BagSize[] = ['small', 'medium', 'large'];
@@ -60,7 +59,6 @@ export function ConfigPanel({
   onToggleWhiteBackground,
   onReset,
   onSubmit,
-  onDownload,
 }: ConfigPanelProps) {
   const t = useTranslations('configurator');
   const tGlobal = useTranslations();
@@ -246,12 +244,12 @@ export function ConfigPanel({
       )}
 
       <div className="space-y-3 pt-2">
-        <Button onClick={onDownload} variant="secondary" size="md" className="w-full">
-          {t('downloadPreview')}
-        </Button>
         <Button onClick={onSubmit} variant="primary" size="md" className="w-full">
-          {t('submitDesign')}
+          {t('getPreview')}
         </Button>
+        <p className="text-center text-xs text-slate-500 leading-snug">
+          {t('getPreviewHint')}
+        </p>
         <button
           onClick={onReset}
           className="flex w-full items-center justify-center gap-1.5 py-2 text-xs text-slate-500 transition-colors hover:text-slate-700"

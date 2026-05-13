@@ -200,34 +200,39 @@ export function useConfigurator({ category, initialVariantId }: UseConfiguratorO
   }, [state.logoPreviewUrl]);
 
   /**
-   * Submit the design inquiry.
-   * Currently logs the data — connect to your API/email service later.
+   * Submit the design inquiry — POSTs to /api/leads with preview image.
    */
   const submitInquiry = useCallback(
-    async (formData: Omit<InquiryFormData, 'configuration'>) => {
+    async (
+      formData: Omit<InquiryFormData, 'configuration'>,
+      previewImage?: string | null
+    ) => {
       setSubmissionStatus('submitting');
 
-      const inquiry: InquiryFormData = {
-        ...formData,
-        configuration: {
-          category: state.category,
-          variantId: state.variantId,
-          colorId: state.colorId,
-          logoPreviewUrl: state.logoPreviewUrl,
-          logoScale: state.logoScale,
-          removeWhiteBackground: state.removeWhiteBackground,
-          customText: state.customText,
-        },
-      };
-
       try {
-        // TODO: Replace with actual API call
-        // await fetch('/api/inquiry', { method: 'POST', body: JSON.stringify(inquiry) });
-        console.log('[Inquiry Submission]', inquiry);
+        const response = await fetch('/api/leads', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: formData.name,
+            company: formData.company,
+            email: formData.email,
+            phone: formData.phone,
+            notes: formData.notes,
+            category: state.category,
+            variantId: state.variantId,
+            colorId: state.colorId,
+            customText: state.customText,
+            logoScale: state.logoScale,
+            removeWhiteBackground: state.removeWhiteBackground,
+            previewImage: previewImage ?? null,
+          }),
+        });
 
-        // Simulate network delay
-        await new Promise((resolve) => setTimeout(resolve, 1500));
-
+        if (!response.ok) {
+          setSubmissionStatus('error');
+          return;
+        }
         setSubmissionStatus('success');
       } catch {
         setSubmissionStatus('error');

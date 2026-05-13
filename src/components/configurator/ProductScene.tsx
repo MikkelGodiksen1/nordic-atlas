@@ -282,8 +282,6 @@ function BagMesh({
     clonedScene.traverse((child) => {
       if (!(child instanceof THREE.Mesh)) return;
 
-      child.castShadow = true;
-      child.receiveShadow = true;
       child.frustumCulled = false;
 
       if (child.geometry.getAttribute('uv') && !child.geometry.getAttribute('uv2')) {
@@ -374,7 +372,6 @@ export function ProductScene({
   return (
     <Canvas
       key={modelPath}
-      shadows
       dpr={[1, 2.25]}
       gl={{ antialias: true, alpha: true, preserveDrawingBuffer: true }}
       camera={{ position: [displayedMax * 0.42, displayedHeight * 0.56, cameraDistance], fov: 32 }}
@@ -384,9 +381,6 @@ export function ProductScene({
       <directionalLight
         position={[displayedMax * 1.75, displayedHeight * 1.8, displayedMax * 1.9]}
         intensity={1.95}
-        castShadow
-        shadow-mapSize-width={2048}
-        shadow-mapSize-height={2048}
       />
       <directionalLight
         position={[-displayedMax * 1.25, displayedHeight * 0.92, -displayedMax * 1.5]}
@@ -405,15 +399,6 @@ export function ProductScene({
           printArea={printArea}
         />
       </Suspense>
-
-      <mesh
-        rotation={[-Math.PI / 2, 0, 0]}
-        position={[0, -(displayedHeight / 2) - 0.045, 0]}
-        receiveShadow
-      >
-        <circleGeometry args={[displayedMax * 1.2, 72]} />
-        <shadowMaterial transparent opacity={0.18} />
-      </mesh>
 
       <OrbitControls
         enablePan={false}

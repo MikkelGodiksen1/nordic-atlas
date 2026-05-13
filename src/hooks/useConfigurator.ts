@@ -15,6 +15,7 @@ export function useConfigurator({ category, initialVariantId }: UseConfiguratorO
   const defaultVariant = initialVariantId
     ? getVariantById(initialVariantId)
     : variants.find((variant) => variant.family === 'pizza' && variant.size === 'medium')
+      ?? variants.find((variant) => variant.family === 'tote' && variant.size === 'medium')
       ?? variants.find((variant) => variant.size === 'medium')
       ?? variants[0];
 

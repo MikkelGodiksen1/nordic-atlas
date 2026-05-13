@@ -115,7 +115,7 @@ export function ToteConfiguratorContent() {
                 customText={state.customText}
                 logoScale={state.logoScale}
                 removeWhiteBackground={state.removeWhiteBackground}
-                showVariantSelector={false}
+                showVariantSelector={true}
                 onSelectFamily={selectFamily}
                 onSelectSize={selectSize}
                 onSelectColor={selectColor}

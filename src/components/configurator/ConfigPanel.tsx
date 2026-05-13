@@ -84,42 +84,44 @@ export function ConfigPanel({
 
   return (
     <div className="space-y-7">
-      {showVariantSelector && familyOptions.length > 1 && (
+      {showVariantSelector && (familyOptions.length > 1 || sizeOptions.length > 1) && (
         <div className="space-y-5">
-          <div>
-            <label className="mb-3 block text-sm font-semibold text-slate-900">
-              {t('selectCategory')}
-            </label>
-            <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
-              {familyOptions.map((variant) => {
-                const isSelected = variant.family === selectedFamily;
-                return (
-                  <button
-                    key={variant.family}
-                    onClick={() => onSelectFamily(variant.family)}
-                    className={cn(
-                      'rounded-2xl border px-4 py-3 text-left transition-all duration-200',
-                      isSelected
-                        ? 'border-brand-600 bg-brand-50/70 shadow-sm ring-1 ring-brand-600/20'
-                        : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50'
-                    )}
-                  >
-                    <p className={cn(
-                      'text-sm font-semibold',
-                      isSelected ? 'text-brand-900' : 'text-slate-900'
-                    )}>
-                      {tGlobal(variant.nameKey)}
-                    </p>
-                    <p className="mt-1 text-xs leading-5 text-slate-500">
-                      {tGlobal(variant.descriptionKey)}
-                    </p>
-                  </button>
-                );
-              })}
+          {familyOptions.length > 1 && (
+            <div>
+              <label className="mb-3 block text-sm font-semibold text-slate-900">
+                {t('selectCategory')}
+              </label>
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+                {familyOptions.map((variant) => {
+                  const isSelected = variant.family === selectedFamily;
+                  return (
+                    <button
+                      key={variant.family}
+                      onClick={() => onSelectFamily(variant.family)}
+                      className={cn(
+                        'rounded-2xl border px-4 py-3 text-left transition-all duration-200',
+                        isSelected
+                          ? 'border-brand-600 bg-brand-50/70 shadow-sm ring-1 ring-brand-600/20'
+                          : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50'
+                      )}
+                    >
+                      <p className={cn(
+                        'text-sm font-semibold',
+                        isSelected ? 'text-brand-900' : 'text-slate-900'
+                      )}>
+                        {tGlobal(variant.nameKey)}
+                      </p>
+                      <p className="mt-1 text-xs leading-5 text-slate-500">
+                        {tGlobal(variant.descriptionKey)}
+                      </p>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
-          </div>
+          )}
 
-          {sizeOptions.length > 0 && (
+          {sizeOptions.length > 1 && (
             <div>
               <label className="mb-3 block text-sm font-semibold text-slate-900">
                 {t('selectSize')}

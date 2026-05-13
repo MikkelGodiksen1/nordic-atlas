@@ -246,9 +246,11 @@ function BagMesh({
   dimensions,
   printArea,
   handleStretch = 1,
+  depthScale = 1,
 }: Required<Pick<ViewerProps, 'modelPath' | 'colorHex' | 'customText' | 'dimensions' | 'logoScale' | 'removeWhiteBackground'>> & {
   logoUrl: string | null;
   handleStretch?: number;
+  depthScale?: number;
   printArea?: BagPrintArea;
 }) {
   const { scene } = useGLTF(modelPath);
@@ -360,7 +362,9 @@ function BagMesh({
 
   const area = { ...DEFAULT_PRINT_AREA, ...printArea };
   const centeredBase = -dimensions.height / 2;
-  const frontZ = (dimensions.depth / 2) + FRONT_OFFSET;
+  // Compensate for the depthScale on the parent group so the logo/text plane
+  // keeps the same world-space offset from the front of the bag.
+  const frontZ = (dimensions.depth / 2) + FRONT_OFFSET / depthScale;
   const baseLogoSize = Math.min(dimensions.width * area.logoWidthRatio, dimensions.height * 0.48);
   const logoSize = Math.min(
     Math.max(baseLogoSize * logoScale, dimensions.width * 0.24),
@@ -369,9 +373,10 @@ function BagMesh({
   const logoCenterY = centeredBase + (dimensions.height * area.centerHeightRatio);
   const textY = logoCenterY - (logoSize / 2) - (dimensions.height * area.textOffsetRatio);
   const textColor = isLightColor(colorHex) ? '#243344' : '#f8fafc';
+  const groupScale: [number, number, number] = [DISPLAY_SCALE, DISPLAY_SCALE, DISPLAY_SCALE * depthScale];
 
   return (
-    <group scale={DISPLAY_SCALE}>
+    <group scale={groupScale}>
       <primitive object={clonedScene} position={[0, centeredBase, 0]} />
       {processedLogoTexture && (
         <LogoLayer
@@ -404,7 +409,8 @@ export function ProductScene({
   dimensions,
   printArea,
   handleStretch,
-}: Pick<ViewerProps, 'modelPath' | 'colorHex' | 'logoUrl' | 'logoScale' | 'removeWhiteBackground' | 'customText' | 'dimensions' | 'printArea' | 'handleStretch'>) {
+  depthScale,
+}: Pick<ViewerProps, 'modelPath' | 'colorHex' | 'logoUrl' | 'logoScale' | 'removeWhiteBackground' | 'customText' | 'dimensions' | 'printArea' | 'handleStretch' | 'depthScale'>) {
   if (!modelPath || !dimensions) {
     return null;
   }
@@ -451,6 +457,7 @@ export function ProductScene({
           dimensions={dimensions}
           printArea={printArea}
           handleStretch={handleStretch}
+          depthScale={depthScale}
         />
       </Suspense>
 

@@ -65,6 +65,8 @@ export interface ViewerProps {
   printArea?: BagPrintArea;
   /** Multiplier applied to handle height so totes can stretch them taller than retail bags */
   handleStretch?: number;
+  /** Multiplier applied to bag depth (Z) so totes can be rendered flat like real cotton totes */
+  depthScale?: number;
 }
 
 /** Export/download options */

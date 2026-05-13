@@ -73,6 +73,7 @@ export function ProductViewer({
   dimensions,
   printArea,
   handleStretch,
+  depthScale,
 }: ViewerProps) {
   const t = useTranslations('configurator');
   const has3DModel = Boolean(modelPath && dimensions);
@@ -91,6 +92,7 @@ export function ProductViewer({
           dimensions={dimensions}
           printArea={printArea}
           handleStretch={handleStretch}
+          depthScale={depthScale}
         />
       ) : (
         <PlaceholderBag
